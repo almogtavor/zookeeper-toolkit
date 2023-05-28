@@ -1,0 +1,5 @@
+<solr persistent="false">
+    <cores adminPath="/admin/cores">
+        <core name="core1" instanceDir="core1" />
+    </cores>
+</solr>

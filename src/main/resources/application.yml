@@ -1,0 +1,69 @@
+spring:
+  main:
+    web-application-type: reactive
+
+  solr:
+    zkHost: localhost:2181
+    collection: mycollection
+    defaultField: text
+    maxRows: 10
+    start: 0
+    hlFields: title,content
+    hlSimplePre: <em>
+    hlSimplePost: </em>
+    hlFragSize: 100
+    hlRequireFieldMatch: true
+    hlUseFastVectorHighlighter: true
+    hlUsePhraseHighlighter: true
+    solrUrl: http://localhost:8983/solr
+    solrHome: /opt/solr
+    solrXml: solr.xml
+    schemaXml: schema.xml
+    maxConnectionsPerHost: 100
+    maxTotalConnections: 1000
+    connectionTimeout: 10000
+    maxRetries: 1
+    followRedirects: true
+    basicAuthUsername: solr
+    basicAuthPassword: secret
+    sslKeyStore: /path/to/keystore.jks
+    sslKeyStorePassword: secret
+    sslTrustStore: /path/to/truststore.jks
+    sslTrustStorePassword: secret
+    allowCompression: true
+    useMultiPartPost: false
+    useAuth: false
+    updateHandler: /update
+    updateLog: /update/log
+    maxWarmingSearchers: 2
+    searcherExecutorPoolSize: 8
+    searcherExecutorMaxPoolSize: 32
+    searcherExecutorQueueSize: 100
+    useColdSearcher: true
+    minIdleThreadCount: 0
+    maxIdleThreadCount: 8
+    maxThreadCount: 128
+    minThreadCount: 8
+    threadIdleTime: 60000
+  banner:
+    location: logo-ascii.txt
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    health:
+      probes:
+        enabled: true
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+  security:
+    enabled: false
+springdoc:
+  version: "${VERSION:1.0.0}"
+  swagger-ui:
+    path: "/"
+server:
+  port: 2783

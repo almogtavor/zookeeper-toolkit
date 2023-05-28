@@ -1,0 +1,7 @@
+<schema name="example" version="1.6">
+    <fields>
+        <field name="id" type="string" indexed="true" stored="true" required="true" />
+        <field name="text" type="text_general" indexed="true" stored="true" />
+    </fields>
+    <uniqueKey>id</uniqueKey>
+</schema>
