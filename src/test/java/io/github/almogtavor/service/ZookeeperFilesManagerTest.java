@@ -1,6 +1,5 @@
 package io.github.almogtavor.service;
 
-import io.github.almogtavor.service.ZookeeperFileService;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
@@ -15,10 +14,10 @@ import static org.mockito.Mockito.*;
 import java.util.Arrays;
 
 @ExtendWith(MockitoExtension.class)
-class ZookeeperFileServiceTest {
+class ZookeeperFilesManagerTest {
 
     @InjectMocks
-    private ZookeeperFileService zookeeperFileService;
+    private ZookeeperFilesManager zookeeperFileService;
 
     @Mock
     private ZooKeeper sourceZkClient;

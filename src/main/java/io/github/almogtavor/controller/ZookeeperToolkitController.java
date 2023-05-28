@@ -7,10 +7,9 @@ import org.apache.zookeeper.KeeperException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 import io.github.almogtavor.configuration.PreConfiguredZkHosts;
-import io.github.almogtavor.service.ZookeeperDownloadUploadService;
+import io.github.almogtavor.service.ZookeeperConfigurationManager;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,7 +19,7 @@ import java.util.Map;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class ZookeeperToolkitController {
-    private final ZookeeperDownloadUploadService zookeeperDownloadUploadService;
+    private final ZookeeperConfigurationManager zookeeperDownloadUploadService;
 
     @PostMapping(value = "/downloadAllZkData")
     public ResponseEntity<byte[]> downloadAllZkData(@RequestParam("zkHost") PreConfiguredZkHosts preConfiguredZkHosts) throws IOException, KeeperException, InterruptedException {
@@ -32,34 +31,19 @@ public class ZookeeperToolkitController {
         return zookeeperDownloadUploadService.downloadConfDirs(preConfiguredZkHosts.getHost(), dirs);
     }
 
-    /**
-     * Currently uploadConfDirs doesn't work from Swagger / Postman
-     */
-//    @Deprecated
-    @PostMapping(value = "/uploadConfDirs/zip", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<String> uploadConfDirs(@RequestParam("zkHost") PreConfiguredZkHosts zkHost, @RequestPart("file") MultipartFile file) throws IOException, KeeperException, InterruptedException {
-        return zookeeperDownloadUploadService.uploadConfDirs(zkHost.getHost(), file);
-    }
-
-    @PostMapping(value = "/uploadConfDirs/binary", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<String> uploadConfDirs(@RequestParam("zkHost") PreConfiguredZkHosts zkHost, @RequestBody byte[] fileData) throws IOException, KeeperException, InterruptedException {
+    @PostMapping(value = "/uploadConfDirs", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<String> uploadConfDirs(@RequestParam("zkHost") PreConfiguredZkHosts zkHost, @RequestBody byte[] fileData) throws IOException, InterruptedException, KeeperException {
         return zookeeperDownloadUploadService.uploadConfDirs(zkHost.getHost(), fileData);
     }
-
-    @PostMapping(value = "/uploadConfDirs")
-    public ResponseEntity<String> uploadConfDirs(@RequestParam("zkHost") PreConfiguredZkHosts zkHost, @RequestParam("dirName") String dirName, @RequestPart("files") MultipartFile[] files) throws IOException, KeeperException, InterruptedException {
-        return zookeeperDownloadUploadService.uploadConfDirs(zkHost.getHost(), dirName, files);
-    }
-
-        @PostMapping(value = "/transferConfDirs")
-    public ResponseEntity<String> transferConfDirs(@RequestParam("sourceZkHost") PreConfiguredZkHosts sourceZkHost,
+    @PostMapping(value = "/copyConfDirsBetweenZks")
+    public ResponseEntity<String> copyConfDirs(@RequestParam("sourceZkHost") PreConfiguredZkHosts sourceZkHost,
                                                    @RequestParam("targetZkHost") PreConfiguredZkHosts targetZkHost,
                                                    @Schema(type = "array", defaultValue = "[\"_default\"]")
-                                                   @RequestParam List<String> dirs,
+                                                   @RequestParam List<String> dirsToCopyFromSource,
                                                    @Schema(type = "object", defaultValue = "{\"_default\": \"targetDirName\"}")
-                                                   @RequestParam Map<String, String> dirMap) throws IOException, KeeperException, InterruptedException {
-        zookeeperDownloadUploadService.transferConfDirs(sourceZkHost.getHost(), targetZkHost.getHost(), dirs, dirMap);
-        return ResponseEntity.ok().body("Files successfully transferred from source to target ZooKeeper");
+                                                   @RequestParam Map<String, String> sourceToTargetDirNamesMapping) throws IOException, KeeperException, InterruptedException {
+        zookeeperDownloadUploadService.copyConfDirs(sourceZkHost.getHost(), targetZkHost.getHost(), dirsToCopyFromSource, sourceToTargetDirNamesMapping);
+        return ResponseEntity.ok().body("Files successfully copied from source to target ZooKeeper");
     }
 
     @GetMapping("/viewConfigDirs")
@@ -74,14 +58,20 @@ public class ZookeeperToolkitController {
         return zookeeperDownloadUploadService.downloadAllZkData(zkHost);
     }
 
-    @PostMapping(value = "/custom/transferConfDirs")
+    @PostMapping(value = "/custom/uploadConfDirs", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Tag(name = "custom")
-    public ResponseEntity<String> customTransferConfDirs(@RequestParam("sourceZkHost") String sourceZkHost,
+    public ResponseEntity<String> customUploadConfDirs(@RequestParam("zkHost") String zkHost, @RequestBody byte[] fileData) throws IOException, InterruptedException, KeeperException {
+        return zookeeperDownloadUploadService.uploadConfDirs(zkHost, fileData);
+    }
+
+    @PostMapping(value = "/custom/copyConfDirsBetweenZks")
+    @Tag(name = "custom")
+    public ResponseEntity<String> customCopyConfDirs(@RequestParam("sourceZkHost") String sourceZkHost,
                                                    @RequestParam("targetZkHost") String targetZkHost,
-                                                   @RequestParam List<String> dirs,
-                                                   @RequestParam Map<String, String> dirMap) throws IOException, KeeperException, InterruptedException {
-        zookeeperDownloadUploadService.transferConfDirs(sourceZkHost, targetZkHost, dirs, dirMap);
-        return ResponseEntity.ok().body("Files successfully transferred from source to target ZooKeeper");
+                                                   @RequestParam List<String> dirsToCopyFromSource,
+                                                   @RequestParam Map<String, String> sourceToTargetDirNamesMapping) throws IOException, KeeperException, InterruptedException {
+        zookeeperDownloadUploadService.copyConfDirs(sourceZkHost, targetZkHost, dirsToCopyFromSource, sourceToTargetDirNamesMapping);
+        return ResponseEntity.ok().body("Files successfully copied from source to target ZooKeeper");
     }
 
     @PostMapping(value = "/custom/downloadConfDirs")

@@ -13,7 +13,7 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Zookeeper Toolkit")
+                        .title("ZKT - Zookeeper Toolkit")
                         .description(
                                 """
                                         Zookeeper Toolkit.
