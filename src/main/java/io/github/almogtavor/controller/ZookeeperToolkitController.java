@@ -1,5 +1,6 @@
 package io.github.almogtavor.controller;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +32,24 @@ public class ZookeeperToolkitController {
         return zookeeperDownloadUploadService.downloadConfDirs(preConfiguredZkHosts.getHost(), dirs);
     }
 
-    @PostMapping(value = "/uploadConfDirs", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<String> uploadConfDirs(@RequestParam("zkHost") PreConfiguredZkHosts zkHost, @RequestBody byte[] fileData) throws IOException, InterruptedException, KeeperException {
-        return zookeeperDownloadUploadService.uploadConfDirs(zkHost.getHost(), fileData);
+    @PostMapping(value = "/uploadConfDir", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<String> uploadConfDir(@RequestParam("zkHost") PreConfiguredZkHosts zkHost,
+                                                @Parameter(description = "When configured, we'll expect a zip full of files which will get uploaded to a directory with this name.\n" +
+                                                                         "When null, we'd expect the zip to contain a dir (and the conf files inside it) and we'll upload it to configs/{YOUR_DIR}")
+                                                @RequestParam(required = false) String confDirName,
+                                                @RequestBody byte[] fileData) throws IOException, InterruptedException, KeeperException {
+        return zookeeperDownloadUploadService.uploadConfDir(zkHost.getHost(), confDirName, fileData);
     }
+
+    @PostMapping(value = "/uploadZkConfFile", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<String> uploadZkConfFile(@RequestParam("zkHost") PreConfiguredZkHosts zkHost,
+                                                 @RequestParam String confDir,
+                                                 @RequestParam String fileName,
+                                                 @RequestBody byte[] fileData) throws IOException, InterruptedException, KeeperException {
+        return zookeeperDownloadUploadService.uploadZkConfFile(zkHost.getHost(), confDir, fileName, fileData);
+    }
+
+
     @PostMapping(value = "/copyConfDirsBetweenZks")
     public ResponseEntity<String> copyConfDirs(@RequestParam("sourceZkHost") PreConfiguredZkHosts sourceZkHost,
                                                    @RequestParam("targetZkHost") PreConfiguredZkHosts targetZkHost,
@@ -60,8 +75,17 @@ public class ZookeeperToolkitController {
 
     @PostMapping(value = "/custom/uploadConfDirs", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Tag(name = "custom")
-    public ResponseEntity<String> customUploadConfDirs(@RequestParam("zkHost") String zkHost, @RequestBody byte[] fileData) throws IOException, InterruptedException, KeeperException {
-        return zookeeperDownloadUploadService.uploadConfDirs(zkHost, fileData);
+    public ResponseEntity<String> customUploadConfDirs(@RequestParam("zkHost") String zkHost, @RequestParam String dirName, @RequestBody byte[] fileData) throws IOException, InterruptedException, KeeperException {
+        return zookeeperDownloadUploadService.uploadConfDir(zkHost, dirName, fileData);
+    }
+
+    @PostMapping(value = "/custom/uploadZkConfFile", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @Tag(name = "custom")
+    public ResponseEntity<String> customUploadZkConfFile(@RequestParam String zkHost,
+                                                   @RequestParam String confDir,
+                                                   @RequestParam String fileName,
+                                                   @RequestBody byte[] fileData) throws IOException, InterruptedException, KeeperException {
+        return zookeeperDownloadUploadService.uploadZkConfFile(zkHost, confDir, fileName, fileData);
     }
 
     @PostMapping(value = "/custom/copyConfDirsBetweenZks")

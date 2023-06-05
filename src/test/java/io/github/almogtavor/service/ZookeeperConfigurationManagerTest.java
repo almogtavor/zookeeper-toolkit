@@ -57,7 +57,7 @@ class ZookeeperConfigurationManagerTest {
 
         try (MockedConstruction<ZooKeeper> mocked = Mockito.mockConstruction(ZooKeeper.class)) {
             // When
-            ResponseEntity<String> responseEntity = zookeeperConfigurationManager.uploadConfDirs(host, fileData);
+            ResponseEntity<String> responseEntity = zookeeperConfigurationManager.uploadConfDir(host, "", fileData);
 
             // Then
             assertThat(responseEntity).isNotNull();
@@ -74,7 +74,7 @@ class ZookeeperConfigurationManagerTest {
 
         try (MockedConstruction<ZooKeeper> mocked = Mockito.mockConstruction(ZooKeeper.class)) {
             // When
-            ResponseEntity<String> responseEntity = zookeeperConfigurationManager.uploadConfDirs(host, fileData);
+            ResponseEntity<String> responseEntity = zookeeperConfigurationManager.uploadConfDir(host, "", fileData);
 
             // Then
             assertThat(responseEntity).isNotNull();
