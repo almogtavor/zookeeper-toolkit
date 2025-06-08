@@ -1,5 +1,6 @@
-# Zookeeper Toolkit
+# zkt - Zookeeper Toolkit
 
+An API with Swagger to let you download and upload files & dirs to Zookeeper 🫎
 
 ## Routes
 
